@@ -13,7 +13,10 @@ app.use((req, res, next) => {
 
 app.get('/proxy/*', async (req, res) => {
   try {
-    const target = req.params[0] // полный URL идёт после /proxy/
+    const base = req.params[0]                     // https://api.nytimes.com/svc/...
+    const qs = req.url.includes('?') ? req.url.split('?')[1] : '' // всё после ?
+    const target = qs ? `${base}?${qs}` : base     // восстановили полный URL
+    
     const r = await fetch(target)
     const text = await r.text()
     const contentType = r.headers.get('content-type') || 'application/json'
