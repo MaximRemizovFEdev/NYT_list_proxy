@@ -16,8 +16,11 @@ app.get('/proxy/*', async (req, res) => {
     const target = req.params[0] // полный URL идёт после /proxy/
     const r = await fetch(target)
     const text = await r.text()
-    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(text)
+    const contentType = r.headers.get('content-type') || 'application/json'
+    console.log(`[proxy] ${new Date().toISOString()} status=${r.status} url=${target} content-type=${contentType} bytes=${text.length}`)
+    res.status(r.status).type(contentType).send(text)
   } catch (e) {
+    console.error('[proxy:error]', e)
     res.status(500).json({ error: 'proxy error' })
   }
 })
